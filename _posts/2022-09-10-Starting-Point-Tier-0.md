@@ -110,13 +110,13 @@ A partir de aquí, ya seremos *root*, teniendo privilegios máximos sobre la má
 
 ## Fase de reconocimiento 
 
-Como la fase de reconocimiento inicial siempre es la misma y la he explicado detalladamente en la máquina anterior ([Meow](#id3.1)), ahora iré al grano. Primeramente enviamos un *ping* para saber si la máquina esta activa y para saber a qué sistema operativo nos estamos enfrentando:
+Como la fase de reconocimiento inicial siempre es la misma y la he explicado detalladamente en la máquina anterior, ahora iré al grano. Primeramente enviamos un *ping* para saber si la máquina esta activa y para saber a qué sistema operativo nos estamos enfrentando:
 
 ![](/photos/2022-09-10-Starting_point-Tier-0/fawn/ping.jpg)
 
 La máquina está activa y es *Linux*. 
 
-Ahora escanearemos todo el rango de puertos con la misma combinación de parámetros que antes ([Meow](#id3.1)):
+Ahora escanearemos todo el rango de puertos con la misma combinación de parámetros que antes:
 
 ![](/photos/2022-09-10-Starting_point-Tier-0/fawn/allports.jpg)
 
@@ -295,7 +295,7 @@ Este es el volcado */etc/passwd/* de la máquina víctima:
 
 ## Fase de reconocimiento
 
-Como siempre  procedemos a enviarle un *ping* a la máquina para saber si nos estamos enfrentando a un *Linux* o *Windows*. Recuerdo que esta primera fase de reconocimiento está mejor detallada en la primera máquina que hemos resuelto, [Meow](#id3.1).
+Como siempre  procedemos a enviarle un *ping* a la máquina para saber si nos estamos enfrentando a un *Linux* o *Windows*. Recuerdo que esta primera fase de reconocimiento está mejor detallada en la primera máquina que hemos resuelto.
 
 ![](/photos/2022-09-10-Starting_point-Tier-0/explosion/ping.jpg)
 
@@ -309,7 +309,7 @@ Y ahora a detectar las **versiones y servicios** que corren para estos puertos c
 
 ![](/photos/2022-09-10-Starting_point-Tier-0/explosion/targeted.jpg)
 
-Menos el puerto 3389, todos los servicios que corren bajo estos puertos abiertos ya los había explicado en la máquina [Dancing](#id3.3).
+Menos el puerto 3389, todos los servicios que corren bajo estos puertos abiertos ya los había explicado en la máquina *Dancing*.
 
 *Remote Desktop Protocol* (RDP, *3389 TCP*) es un protocolo que proporciona al usuario una interfaz gráfica para conectarse a otro equipo a través de una conexión de red. Pero necesitaremos poseer de **credenciales** válidas para podernos conectar. 
 

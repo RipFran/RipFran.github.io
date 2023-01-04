@@ -568,7 +568,7 @@ Efectivamente, en el proceso **762** vemos lo siguiente:
 
 Las **credenciales** que se han utilizado para poder acceder al servicio web del puerto 3366 son ```loki:godofmischiefisloki```.
 
-Además, ***SNMP*** también nos permite visualizar la ***ipv6*** de la máquina víctima. Recordemos que no es lo mismo escanear puertos por ipv4 que por ipv6. A lo mejor la máquina tiene implementadas reglas ***iptables*** que no permiten escanear puertos por ipv4 y viceversa (En el [Anexo](#id5.2) se pueden ver las reglas implementadas). La podemos obtener con el comando ```snmpbulkwalk -c public -v2c 10.10.10.92 ipAddressType```:
+Además, ***SNMP*** también nos permite visualizar la ***ipv6*** de la máquina víctima. Recordemos que no es lo mismo escanear puertos por ipv4 que por ipv6. A lo mejor la máquina tiene implementadas reglas ***iptables*** que no permiten escanear puertos por ipv4 y viceversa (En el Anexo se pueden ver las reglas implementadas). La podemos obtener con el comando ```snmpbulkwalk -c public -v2c 10.10.10.92 ipAddressType```:
 
 <img src="/photos/2022-10-14-Mischief-WriteUp/ipAddressType.png"  />  
 
@@ -624,7 +624,7 @@ Lo siguiente que intento hacer es ejecutar comandos como *ls* o *cat /home/loki/
 
 <img src="/photos/2022-10-14-Mischief-WriteUp/id.png"  />  
 
-Para manejarnos mejor y tener acceso a todos los comandos y directorios de la máquina víctima, vamos a enviarnos una reverse shell. **Lo haremos por ipv6**, ya hay reglas iptables configurardas y no será posible por ipv4 (ver [Anexo](#id5.2)).
+Para manejarnos mejor y tener acceso a todos los comandos y directorios de la máquina víctima, vamos a enviarnos una reverse shell. **Lo haremos por ipv6**, ya hay reglas iptables configurardas y no será posible por ipv4 (ver Anexo).
 
 Por lo tanto, el ***payload*** que utilizaré será:
 
@@ -638,9 +638,9 @@ Ahora, si me pongo en escucha por esta interfaz con el comando *ncat -nv6 --list
 
 <img src="/photos/2022-10-14-Mischief-WriteUp/consolereceived.png"  />  
 
-[Aquí](#id5.1) dejo un *script* en python que te automatiza la intrusión como el usuario www-data.
+En el primer apartado del ***Anexo*** dejo un *script* en python que te automatiza la intrusión como el usuario www-data.
 
-En el [Anexo](#id5.3) explico una forma de poder visualizar el archivo ***credentials*** sin ganar acceso a la máquina, con ***pings***.
+En el **Anexo** explico una forma de poder visualizar el archivo ***credentials*** sin ganar acceso a la máquina, con ***pings***.
 
 #  Consiguiendo shell como loki
 

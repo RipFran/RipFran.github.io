@@ -319,7 +319,7 @@ Después de darle a *Forward* ya habremos modificado el archivo en la máquina v
 
 <img src="/photos/2022-10-08-OpenSource-WriteUp/revShell.png" alt="drawing"  />  
 
-Existe otra forma de ganar acceso al contenedor. La contemplo en el apartado [Extra](#id5.1).
+Existe otra forma de ganar acceso al contenedor. La contemplo en el apartado I*Extra*.
 
 ## Script Autopwn 
 
