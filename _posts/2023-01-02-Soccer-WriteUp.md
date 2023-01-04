@@ -2,21 +2,22 @@
 title: Soccer WriteUp
 date: 2023-01-02 19:00:00 +/-TTTT
 categories: [HTB, easy]
-tags: [webshell,php,websockets,sqli blind, htb]     # TAG names should always be lowercase
+tags: [webshell,php,websockets,sqli blind, htb,linux]     # TAG names should always be lowercase
 image: /htb.jpg
+img_path: /photos/2023-01-02-Soccer-WriteUp/
 ---
 
-***Soccer*** es una máquina ***Linux*** donde primeramente conseguiremos explotar el servicio ***Tiny File Manager*** subiendo una ***webshell*** en *PHP*. Siendo ***www-data*** descubriremos un ***subdominio*** que utiliza ***websockets***. Explotaremos un ***SQLI Blind Time Based*** para convertirnos en el usuario ***player***. Finalmente, nos ayudaremos de las herramientas ***dstat*** y ***doas*** para escalar privilegios y convertirnos en ***root***.
+***Soccer*** es una máquina *Linux* donde primeramente conseguiremos explotar el servicio *Tiny File Manager* subiendo una ***webshell*** en *PHP*. Siendo ***www-data*** descubriremos un **subdominio** que utiliza ***websockets***. Explotaremos un ***SQLI Blind Time Based*** para convertirnos en el usuario ***player***. Finalmente, nos ayudaremos de las herramientas ***dstat*** y ***doas*** para escalar privilegios y convertirnos en ***root***.
 
 # Información de la máquina 
 
 <table width="100%" cellpadding="2">
     <tr>
         <td>
-            <img src="/photos/2023-01-02-Soccer-WriteUp/logo.png" alt="drawing" width="465" style="border: 3px solid grey; border-radius: 20px;" />  
+            <img src="logo.png" alt="drawing" width="465"/>  
         </td>
         <td>
-            <img src="/photos/2023-01-02-Soccer-WriteUp/stats.png" alt="drawing" width="400" style="border: 3px solid grey; border-radius: 20px;" />  
+            <img src="stats.png" alt="drawing" width="400" />  
         </td>
     </tr>
 </table>
@@ -201,11 +202,11 @@ En el directorio principal no tenemos permisos para subir archivos, pero en el d
 
 La subimos:
 
-<img src="/photos/2023-01-02-Soccer-WriteUp/imga1.png" alt="drawing" style="border: 2px solid grey;border-radius: 7px;" />  
+![imagen 1](imga1.png)
 
 Al hacer clic en el archivo y luego a *open*, podremos ejecutar comandos a través del parámetro ***cmd***:
 
-<img src="/photos/2023-01-02-Soccer-WriteUp/image2.png" alt="drawing" style="border: 2px solid grey;border-radius: 7px;" />  
+![imagen 2](image2.png)
 
 En este caso, he ejecutado ***whoami*** a través del parámetro ***cmd***. El siguiente *script* automatiza la subida del archivo y la ejecución de un payload, que envía por el puerto *443* una *reverse shell*:
 
@@ -343,13 +344,12 @@ Encontramos el subdominio ***soc-player*** del dominio *soccer.htb*. Podemos añ
 
 La página web que vemos es bastante parecida a ***http://soccer.htb*** pero ahora con unos cuantos botones más. Podemos hacernos una cuenta e iniciar sesión.
 
-<img src="/photos/2023-01-02-Soccer-WriteUp/image3.png" alt="drawing" style="border: 2px solid grey;border-radius: 7px;" />  
+![imagen 3](image3.png)
 
 Al iniciar sesión, nos encontramos con esta especie de panel. Nos está pidiendo un número. Podemos interceptar la petición con ***Burpsuite*** para ver lo que se está tramitando por detrás.
 
 Lo que interceptamos es lo siguiente:
-
-<img src="/photos/2023-01-02-Soccer-WriteUp/image4.png" alt="drawing" style="border: 2px solid grey;border-radius: 7px;" /> 
+![imagen 4](image4.png)
 
 ***WebSockets*** es un protocolo de red que permite la comunicación bidireccional en tiempo real entre un cliente y un servidor a través de una conexión TCP. En este caso, se está estableciendo la conexión contra ***http://soc-player.soccer.htb:9091/***. Recordemos que en la fase de reconocimiento vimos este puerto abierto, pero no sabíamos al 100% el servicio que estaba corriendo.
 
@@ -371,7 +371,7 @@ el servidor tardará 5 segundos en respondernos, pero no nos dará ningún tipo 
 
 La imagen de abajo es una foto del *Repeater* con el *payload* malicioso en la izquierda y en la derecha la respuesta del servidor:
 
-<img src="/photos/2023-01-02-Soccer-WriteUp/image5.png" alt="drawing" style="border: 2px solid grey;border-radius: 7px;" /> 
+![imagen 5](image5.png)
 
 En este punto que ya sabemos que es vulnerable a este tipo de ataque, podemos aprovecharnos del tiempo para **volcar toda la información de la base de datos**. Usaremos *python3* para desarrollar los *scripts*.
 
