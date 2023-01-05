@@ -173,7 +173,7 @@ La información que se envía por *post* es la siguiente:
 }
 ```
 
-Podemos ver, entre otras cosas, *health up*, que nos indica que la web está activa, y *body*, que contiene el cuerpo HTML de la web (en este caso, el contenido del directorio donde he montado mi servidor python). Si lo *parseamos*, el cuerpo es el siguiente:
+*health up* nos indica que la web está activa y *body* contiene el cuerpo HTML de la web (en este caso, el contenido del directorio donde he montado mi servidor python). Si lo *parseamos*, el cuerpo es el siguiente:
 
 ```html
 <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">
