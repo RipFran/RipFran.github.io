@@ -2,12 +2,12 @@
 title: Health WriteUp
 date: 2023-01-05 06:00:00 +/-TTTT
 categories: [HTB, medium]
-tags: [gogs,sqli,ssrf,webhook,hashcat]     # TAG names should always be lowercase
+tags: [gogs,sqli,ssrf,webhook,hashcat,cve-2014-8682]     # TAG names should always be lowercase
 image: htb.jpg
 img_path: /photos/2023-01-07-Health-WriteUp/
 ---
 
-***Health*** es una máquina *Linux* donde primero explotaremos un ***SSRF*** a través de un ***HTTP redirect*** para conseguir acceder a un servicio web interno de la máquina víctima, ***Gogs***. Posteriormente, conseguiremos explotar un ***SQL Injection*** asociado a este sistema de control de versiones. Para escalar a ***root***, nos aprovecharemos de una **mala implementación** del servicio web y podremos listar la clave privada SSH del usuario ***root***.
+***Health*** es una máquina *Linux* donde primero explotaremos un ***SSRF*** a través de un ***HTTP redirect*** para conseguir acceder a un servicio web interno de la máquina víctima, ***Gogs***. Posteriormente, conseguiremos explotar un ***SQL Injection*** asociado a este sistema de control de versiones. Para escalar a ***root***, nos aprovecharemos de una **mala implementación** del servicio web, pudiendo así listar la **clave privada SSH** del usuario ***root***.
 
 
 # Información de la máquina 
@@ -40,7 +40,7 @@ PING 10.10.11.176 (10.10.11.176) 56(84) bytes of data.
 rtt min/avg/max/mdev = 57.624/57.624/57.624/0.000 ms
 ```
 
-Vemos que nos enfrentamos a una máquina **_Linux_**, ya que su *TTL* es 63.
+Nos enfrentamos a una máquina **_Linux_**, ya que su *TTL* es 63.
 
 ## Port discovery
 
