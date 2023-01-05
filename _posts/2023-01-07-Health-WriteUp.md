@@ -1,6 +1,6 @@
 ---
 title: Health WriteUp
-date: 2023-01-07 06:00:00 +/-TTTT
+date: 2023-01-05 06:00:00 +/-TTTT
 categories: [HTB, medium]
 tags: []     # TAG names should always be lowercase
 image: htb.jpg
