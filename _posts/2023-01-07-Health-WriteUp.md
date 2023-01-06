@@ -557,7 +557,7 @@ func (u *User) EncodePasswd() {
 }
 ```
 
-Está utilizando ***PBKDF2-SHA256***. Ahora, podemos ir a [esta web](https://hashcat.net/wiki/doku.php?id=example_hashes) y buscar el formato de hash conveniente. Utilizaremos el modo 10900. Muestran el siguiente **ejemplo**:
+Está utilizando ***PBKDF2-SHA256***. Podemos ir a [esta web](https://hashcat.net/wiki/doku.php?id=example_hashes) y buscar el formato de hash conveniente. Utilizaremos el modo 10900. Muestran el siguiente **ejemplo**:
 
 ```
 10900 | PBKDF2-HMAC-SHA256 | sha256:1000:MTc3MTA0MTQwMjQxNzY=:PYjCU215Mi57AYPKva9j7mvF4Rc5bCnt
@@ -592,7 +592,7 @@ sha256:10000:c08zWEliZVcxNA==:ZsB0ZFVFeB8QZPt/0Rd0U9uPDKLOWKnYHAS+Lm07oqDWwDLw/U
 
 #### Hashcat para romper el hash
 
-Ahora emplearemos ***hashcat*** para *crackear* el hash. ***Hashcat*** es una herramienta de recuperación de contraseñas que emplea diferentes algoritmos de *hashing* (codificación) para tratar de calcular las contraseñas originales a partir de *hashes*.
+Emplearemos ***hashcat*** para *crackear* el hash. ***Hashcat*** es una herramienta de recuperación de contraseñas que emplea diferentes algoritmos de *hashing* (codificación) para tratar de calcular las contraseñas originales a partir de *hashes*.
 
 El comando será el siguiente:
 
@@ -607,13 +607,13 @@ hashcat -m 10900 -a 0 -d 1 -w 3 hash /usr/share/wordlists/rockyou.txt
 * *hash* es el archivo que contiene el *hash*.
 * */usr/share/wordlists/rockyou.txt* es el diccionario de contraseñas que estaremos utilizando.
 
-Esperado un tiempo obtendremos la siguiente **contraseña**:
+Pasado un tiempo obtendremos la siguiente **contraseña**:
 
 ```bash
 sha256:10000:c08zWEliZVcxNA==:ZsB0ZFVFeB8QZPt/0Rd0U9uPDKLOWKnYHAS+Lm07oqDWwDLw/U74P0jXQ0nsGW9O/jc=:february15
 ```
 
-Ahora, nos podemos intentar autenticar por *SSH* con las credenciales: ***susanne:february15***
+Seguidamente, podemos intentar conectarnos por *SSH* con las credenciales: ***susanne:february15***
 
 ## user.txt
 
@@ -659,7 +659,7 @@ Tenemos acceso a una **base de datos** llamada *laravel* que contiene unas cuant
 
 El programa se puede transferir a la máquina víctima desplegando un servidor en *python* `(python3 -m http.server 80)` compartiendo el fichero y luego en la máquina víctima en un directorio donde tengamos permisos de escritura (como */tmp* o */dev/shm*) hacer un *wget* para descargar el archivo.
 
-Nos encontramos que cada cierto tiempo se está ejecutando lo siguiente por el usuario ***root***:
+Cada cierto tiempo se están ejecutando las siguientes tareas por el usuario ***root***:
 
 ```bash
 CMD: UID=0    PID=19950  | /bin/bash -c cd /var/www/html && php artisan schedule:run >> /dev/null 2>&1
