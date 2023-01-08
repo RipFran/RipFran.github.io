@@ -33,7 +33,7 @@ github:
   username: RipFran            # change to your github username
 
 twitter:
-  username: R1pFr4n           # change to your twitter username
+  username: RipFr4n           # change to your twitter username
 
 social:
   # Change to your full name.
@@ -42,7 +42,7 @@ social:
   email: r1pfr4n0@gmail.com             # change to your email address
   links:
     # The first element serves as the copyright owner's link
-    - https://twitter.com/R1pFr4n      # change to your twitter homepage
+    - https://twitter.com/RipFr4n      # change to your twitter homepage
     - https://github.com/RipFran       # change to your github homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username
