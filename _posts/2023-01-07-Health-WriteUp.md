@@ -1,6 +1,6 @@
 ---
 title: Health WriteUp
-date: 2023-01-05 06:00:00 +/-TTTT
+date: 2023-01-07 06:00:00 +/-TTTT
 categories: [HTB, medium]
 tags: [gogs,sqli,ssrf,webhook,hashcat,cve-2014-8682]     # TAG names should always be lowercase
 image: htb.jpg
@@ -44,7 +44,7 @@ Nos enfrentamos a una máquina **_Linux_**, ya que su *TTL* es 63.
 
 ## Port discovery
 
-A continución procedemos a escanear todo el rango de puertos de la máquina víctima con la finalidad de encontrar aquellos que estén abiertos (_status open_). Lo haremos con la herramienta ***nmap***.
+A continución procedemos a escanear todo el rango de puertos de la máquina víctima. Lo haremos con la herramienta ***nmap***.
 
 ```bash
 nmap -sS --min-rate 5000 -n -Pn -vvv -p- 10.10.11.176 -oG allPorts
