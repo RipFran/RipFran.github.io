@@ -266,6 +266,8 @@ Uno de los *payloads* que nos presenta el artículo anterior para poder explotar
 '|| '1'=='1
 ```
 
+Este *payload* **no nos va a funcionar**.
+
 Imaginemos que tenemos esta *query*, que recibe el usuario y la contraseña que nosostros introducimos y valida el intento de inicio de sesión:
 
 ```js
