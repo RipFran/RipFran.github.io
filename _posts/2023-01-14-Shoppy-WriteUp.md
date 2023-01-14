@@ -286,7 +286,7 @@ Esta *query* con el *payload* anterior devolvería lo siguiente:
 * `'1'=='1' && this.password === '${passToTest}'`: **Falso** (La primera parte es verdadera, pero la contraseña no la sabemos, por lo tanto, el resultado es falso).
 * `this.username === '' || Falso`. **Falso** (La primera parte es falsa, ya que es un campo vacío y la segunda también por lo anterior).
 
-Por lo tanto, el *payload* anterior **no funcinaría** para *bypassear* el panel de *login*. Pero, ¿y si en vez de `'|| '1'=='1` utilizamos `<user>'|| '1'=='1` donde *user* es un usuario válido de la base de datos? El resultado de la *query* sería **cierto**. Ahora debemos de encontrar un usuario que exista en la base de datos. Uno muy común en las máquinas de *Hack The Box* es el usuario *admin*. 
+Por lo tanto, el *payload* anterior **no funcinaría** para *bypassear* el panel de *login*. Pero, ¿y si en vez de `'|| '1'=='1` utilizamos `<user>'|| '1'=='1` donde *user* es un usuario válido de la base de datos? El resultado de la *query* sería **cierto**. Ahora debemos encontrar un usuario que exista en la base de datos. Uno muy común en las máquinas de *Hack The Box* es el usuario *admin*. 
 
 Así, el ***payload*** **válido** sería el siguiente:
 
