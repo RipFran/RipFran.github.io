@@ -27,7 +27,7 @@ img_path: /photos/2023-01-14-Shoppy-WriteUp/
 
 ## ping
 
-En primer lugar  enviaremos un _ping_ a la máquina víctima para conocer su sistema operativo y si tenemos conexión con la misma. Un _TTL_ menor o igual a 64 significa que la máquina es _Linux_. Por otra parte, un _TTL_ menor o igual a 128 significa que la máquina es _Windows_.
+En primer lugar  enviaremos un _ping_ a la máquina víctima para conocer su sistema operativo y saber si tenemos conexión con la misma. Un _TTL_ menor o igual a 64 significa que la máquina es _Linux_. Por otra parte, un _TTL_ menor o igual a 128 significa que la máquina es _Windows_.
 
 ```bash
 ping -c 1 10.10.11.180
