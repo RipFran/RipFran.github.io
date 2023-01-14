@@ -7,7 +7,7 @@ image: shoppy.jpg
 img_path: /photos/2023-01-14-Shoppy-WriteUp/
 ---
 
-***Shoppy*** es una máquina *Linux* donde primeramente explotaremos un ***NoSQL injection*** para bypassear un panel de *login*. A continuación, encontraremos unas **credenciales** que nos servirán para autenticarnos en otro panel de inicio de sesión. Nos conectaremos por **SSH** con un usuario y una contraseña que localizaremos en esta web. Para escalar a root, primero pivotaremos al usuario *deploy* gracias a un **privilegio** que tenemos asignado a nivel de ***sudoers*** y finalmente nos aprovecharemos de que este usuario forma parte del grupo ***docker*** para conseguir **máximos privilegios**.
+***Shoppy*** es una máquina *Linux* en la que primeramente explotaremos un ***NoSQL injection*** para bypassear un panel de *login*. A continuación, encontraremos unas **credenciales** que nos servirán para autenticarnos en otro panel de inicio de sesión. Nos conectaremos por **SSH** con un usuario y una contraseña que localizaremos en esta web. Para escalar a root, primero pivotaremos al usuario *deploy* gracias a un **privilegio** que tenemos asignado a nivel de ***sudoers*** y finalmente nos aprovecharemos de que este usuario forma parte del grupo ***docker*** para conseguir **máximos privilegios**.
 
 
 # Información de la máquina 
