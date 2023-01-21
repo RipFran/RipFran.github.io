@@ -404,7 +404,7 @@ Lo primero que vemos al acceder a http://dev.siteisup.htb es un *Access forbidde
 
 ![imagen 6](Pasted image 20230116235133.png)
 
-Ahora ya podremos ver el contenido de la página web. Introducir constantemente la cabecera en la petición puede ser tedioso. *BurpSuite* ofrece una funcionalidad que introduce la cabecera automáticamente si pasamos la *request* por el *proxy*:
+Ahora ya podemos ver el contenido de la página web. Introducir constantemente la cabecera en la petición puede ser tedioso. *BurpSuite* ofrece una funcionalidad que introduce la cabecera automáticamente si pasamos la *request* por el *proxy*:
 
 Deberemos ir a la configuración del *proxy* y en *Match and Replace* añadiremos la siguiente entrada:
 
@@ -699,7 +699,7 @@ __do_global_dtors_aux
 [...]
 ```
 
-Nos damos cuenta que el binario está llamando a un script de *Python* llamado *siteisup_test.py*. Su contenido es el siguiente:
+Nos damos cuenta de que el binario está llamando a un script de *Python* llamado *siteisup_test.py*. Su contenido es el siguiente:
 
 ```python
 import requests
