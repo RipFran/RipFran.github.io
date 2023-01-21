@@ -130,9 +130,9 @@ wfuzz -c -u 'http://siteisup.htb/' -d 'site=http://localhost:FUZZ&debug=1' -z ra
 ```
 
 **-c** es formato colorizado.  
-**–hw=99** para esconder todas aquellas respuestas que contengan 99 palabras (las páginas que no están disponibles devuelven esta cantidad de caracteres). 
-**-z** para especificar el tipo de *payload*. En este caso, estamos especificando un *payload* del tipo rango, que iterará desde el 1 hasta el 65535 (todo el rango de puertos).
-**-u** para especificar la _url_.
+**–hw=99** para esconder todas aquellas respuestas que contengan 99 palabras (las páginas que no están disponibles devuelven esta cantidad de caracteres).  
+**-z** para especificar el tipo de *payload*. En este caso, estamos especificando un *payload* del tipo rango, que iterará desde el 1 hasta el 65535 (todo el rango de puertos).  
+**-u** para especificar la _url_.  
 **-d** para especificar los datos que se tramitarán por POST. _FUZZ_ es un término de _wfuzz_ donde se va a sustituir cada valor del *payload*.
 
 Pasado un tiempo, obtendremos el siguiente resultado:
