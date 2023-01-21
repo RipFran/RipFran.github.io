@@ -7,7 +7,7 @@ image: updown.jpg
 img_path: /photos/2023-01-21-UpDown-WriteUp/
 ---
 
-***UpDown*** es una máquina ***Linux*** en la que primeramente conseguiremos obtener acceso a un **subdominio** gracias a la información que encontraremos en un ***.git*** expuesto en la página web. Para obtener una *shell* como *www-data*, podremos subir un archivo *PHP* con extensión *.phar* y utilizaremos la función *proc_open()* para burlar las *disable_functions*. Para escalar a *root*, primero **pivotaremos** al usuario *developer* aprovechándonos de un **binario SUID** y explotando la función *input()* de **Python 2**. Finalmente, conseguiremos **máximos permisos** a través de un privilegio que tenemos asignado a nivel de ***sudoers***.
+***UpDown*** es una máquina ***Linux*** con dos servicios expuestos, *HTTP* y *SSH*. En primer lugar, conseguiremos obtener acceso a un **subdominio** gracias a la información que encontraremos en un ***.git*** expuesto en la página web. Para obtener una *shell* como *www-data*, podremos subir un archivo *PHP* con extensión *.phar* y utilizaremos la función *proc_open()* para burlar las *disable_functions*. Para escalar a *root*, primero **pivotaremos** al usuario *developer* aprovechándonos de un **binario SUID** y explotando la función *input()* de **Python 2**. Finalmente, conseguiremos **máximos permisos** a través de un privilegio que tenemos asignado a nivel de ***sudoers***.
 
 # Información de la máquina 
 
