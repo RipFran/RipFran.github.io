@@ -7,7 +7,7 @@ image: awkward.jpg
 img_path: /photos/2023-02-25-Awkward-WriteUp/
 ---
 
-***Awkward*** es una máquina *Linux* con dos servicios expuestos: *SSH* y *HTTP*. Gracias a la información que encontraremos en un **archivo de la página web**, seremos capaces de encontrar y autenticarnos en un panel de *login*. Una vez dentro, descubriemos un *endpoint* vulnerable a ***Server Side Request Forgery (SSRF)***, que nos permitirá descubrir un servicio interno. A través de la información que nos brinda este servicio, conseguiremos ***Local file Inclusion (LFI)*** explotando un *endpoint* de la API. Encontraremos las credenciales *SSH* del usuario *bean* en una nota de **xpad**. Para pivotar al usuario *root*, primero deberemos convertirnos en *www-data*. Explotaremos una **inyección de comandos** que se acontece en un **subdominio**, consiguiendo ***Remote Code Execution (RCE)*** como *www-data*. Finalmente, para conseguir **máximos privilegios**, nos aprovecharemos de un *script* que está ejecutando *root* a intervalos regulares de tiempo.
+***Awkward*** es una máquina *Linux* con dos servicios expuestos: *SSH* y *HTTP*. Gracias a la información que nos ofrece un **archivo de la página web**, seremos capaces de encontrar y autenticarnos en un panel de *login*. Una vez dentro, descubriemos un *endpoint* vulnerable a ***Server Side Request Forgery (SSRF)***, que nos permitirá descubrir un servicio interno. A través de la información que nos brinda este servicio, conseguiremos ***Local file Inclusion (LFI)*** explotando un *endpoint* de la API. Encontraremos las credenciales *SSH* del usuario *bean* en una nota de **xpad**. Para pivotar al usuario *root*, primero deberemos convertirnos en *www-data*. Explotaremos una **inyección de comandos** que se acontece en un **subdominio**, consiguiendo ***Remote Code Execution (RCE)*** como *www-data*. Finalmente, para conseguir **máximos privilegios**, nos aprovecharemos de un *script* que está ejecutando *root* a intervalos regulares de tiempo.
 
 # Clasificación de dificultad de la máquina
 
@@ -30,7 +30,7 @@ PING 10.10.11.185 (10.10.11.185) 56(84) bytes of data.
 rtt min/avg/max/mdev = 91.385/91.385/91.385/0.000 ms
 ```
 
-Vemos que nos enfrentamos a una máquina **_Linux_**, ya que su *TTL* es 63.
+Comprobamos que nos enfrentamos a una máquina **_Linux_**, ya que su *TTL* es 63.
 
 ## Port Discovery
 
@@ -256,7 +256,7 @@ El aspecto del **panel** de **login** es el siguiente:
 
 ![imagen 11](Pasted image 20230220102301.png)
 
-Podríamos intentar explotar un *SQLI* o *NoSQLI* para burlar el panel de login, pero no obtendremos el resultado esperado. En este punto, deberemos de encontrar unas credenciales válidas. Vamos a continuar investigando más archivos presentes en *app.js*. 
+Podríamos intentar explotar un *SQLI* o *NoSQLI* para burlar el panel de login, pero no obtendremos el resultado esperado. En este punto, deberemos encontrar unas credenciales válidas. Vamos a continuar investigando más archivos presentes en *app.js*. 
 
 El archivo *staff.js* nos puede interesar para encontrar usuarios válidos:
 
@@ -469,7 +469,7 @@ Desplegaremos un servidor web con *python*, por ejemplo, para inspeccionar el *i
 
 El **servicio** que corre en el puerto **3002** de la máquina víctima es la **API de *Hat Valley***. Tenemos acceso a la implementación de los *endpoints* de la API. 
 
-* */api/login* se utiliza para el inicio de sesión. No encontramos nada fuera de la normal en su implementación.
+* */api/login* se utiliza para el inicio de sesión. No encontramos nada fuera de lo normal en su implementación.
 * */api/submit-leave* se utiliza para subir un comentario en la sección *Leave Requests* de la web. El código es el siguiente:
 
 ```javascript
@@ -1060,7 +1060,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $_GET['action'] === 'fetch_items' &&
 
 ![imagen 50](Pasted image 20230225131133.png)
 
-Tanto *item* como *user* son utilizados para ejecutar un comando a nivel de sistema. El comando es:
+Tanto *item* como *user* son utilizados para ejecutar un comando a nivel de sistema:
 
 ```bash
 head -2 {$STORE_HOME}product-details/{$item_id}.txt | tail -1 >> {$STORE_HOME}cart/{$user_id}
@@ -1084,7 +1084,7 @@ A parte de esto, poca cosa mas podremos hacer.
 
 ![imagen 52](Pasted image 20230225132802.png)
 
-Tanto *item* como *user* son utilizados para ejecutar un comando a nivel de sistema. El comando es:
+Tanto *item* como *user* son utilizados para ejecutar un comando a nivel de sistema:
 
 ```bash
 sed -i '/item_id={$item_id}/d' {$STORE_HOME}cart/{$user_id}
@@ -1098,7 +1098,7 @@ Aquí las cosas ya cambian respeco a *add to cart*, ya que se está utilizando *
 sed -n '1e id' /etc/hosts
 ```
 
-**La sanitización de caracteres no contempla ni el guión, ni la comilla simple, ni la barra**. Otra combinación de parámetros para ejecutar comando con *sed* es:
+**La sanitización de caracteres no contempla ni el guión, ni la comilla simple, ni la barra**. Otra combinación de parámetros para ejecutar comandos con *sed* es:
 
 ```bash
 sed -e '1e id' /etc/hosts
@@ -1196,7 +1196,7 @@ Para obtener el valor de **christopher.jones**, previamente se ejecuta un *awk* 
 
 En el primer punto del **Anexo**, estudiamos con mas detenimiento el *script* *notify.sh*.
 
-Vamos a añadir en el archivo *leave_requests.csv* la cadena *test*. El usuario *root* debería de enviar un correo electrónico con las siguientes características:
+Vamos a añadir en el archivo *leave_requests.csv* la cadena *test*. El usuario *root* debería enviar un correo electrónico con las siguientes características:
 
 ```bash
 mail -s Leave Request: test christine 
@@ -1226,7 +1226,7 @@ Posteriormente, ejecutaremos el siguiente comando:
 echo 'test --exec="!/tmp/pwned"' >> /var/www/private/leave_requests.csv
 ```
 
-Una vez ejecutado, el usuario *root* debería de ejecutar la siguiente secuencia de comandos:
+Una vez ejecutado, el usuario *root* debería ejecutar la siguiente secuencia de comandos:
 
 ![imagen 61](Pasted image 20230225152733.png)
 
