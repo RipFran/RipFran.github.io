@@ -1,6 +1,6 @@
 ---
 title: Forgot WriteUp
-date: 2023-03-04 16:00:00 +/-TTTT
+date: 2023-03-04 06:00:00 +/-TTTT
 categories: [HTB, medium]
 tags: [cache poisoning, password reset poisoning, python code injection]     # TAG names should always be lowercase
 image: forgot.jpg
@@ -20,7 +20,7 @@ img_path: /photos/2023-03-01-Forgot-WriteUp/
 Mandamos un _ping_ a la máquina víctima, con la finalidad de conocer su sistema operativo y saber si tenemos conexión con la misma. Un _TTL_ menor o igual a 64 significa que la máquina es _Linux_ y un _TTL_ menor o igual a 128 significa que la máquina es _Windows_.
 
 ```bash
-$> ping -c 1 10.10.11.188 
+$> ping -c 1 10.10.11.188
 
 PING 10.10.11.188 (10.10.11.188) 56(84) bytes of data.
 64 bytes from 10.10.11.188: icmp_seq=1 ttl=63 time=92.5 ms
@@ -45,12 +45,12 @@ PORT   STATE SERVICE REASON
 80/tcp open  http    syn-ack ttl 63
 ```
 
-**-sS** efectúa un _TCP SYN Scan_, iniciando rápidamente una conexión sin finalizarla.  
-**-min-rate 5000** sirve para enviar paquetes no más lentos que 5000 paquetes por segundo.  
-**-n** sirve para evitar resolución DNS.  
-**-Pn** para evitar host discovery.  
-**-vvv** triple _verbose_ para que nos vuelque la información que vaya encontrando el escaneo.  
-**-p-** para escanear todo el rango de puertos.  
+**-sS** efectúa un _TCP SYN Scan_, iniciando rápidamente una conexión sin finalizarla.
+**-min-rate 5000** sirve para enviar paquetes no más lentos que 5000 paquetes por segundo.
+**-n** sirve para evitar resolución DNS.
+**-Pn** para evitar host discovery.
+**-vvv** triple _verbose_ para que nos vuelque la información que vaya encontrando el escaneo.
+**-p-** para escanear todo el rango de puertos.
 **-oG** exportará la evidencia en formato _grepeable_ al fichero *allPorts* en este caso.
 
 Hemos encontrado **dos puertos abiertos**, el **22** y el **80**. Un **puerto abierto** está **escuchando solicitudes de conexión entrantes**.
@@ -65,15 +65,15 @@ Host is up (0.10s latency).
 
 PORT   STATE SERVICE VERSION
 22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
-| ssh-hostkey: 
+| ssh-hostkey:
 |   3072 48:ad:d5:b8:3a:9f:bc:be:f7:e8:20:1e:f6:bf:de:ae (RSA)
 |   256 b7:89:6c:0b:20:ed:49:b2:c1:86:7c:29:92:74:1c:1f (ECDSA)
 |_  256 18:cd:9d:08:a6:21:a8:b8:b6:f7:9f:8d:40:51:54:fb (ED25519)
 80/tcp open  http    Werkzeug/2.1.2 Python/3.8.10
 |_http-title: Login
 |_http-server-header: Werkzeug/2.1.2 Python/3.8.10
-| fingerprint-strings: 
-|   FourOhFourRequest: 
+| fingerprint-strings:
+|   FourOhFourRequest:
 |     HTTP/1.1 404 NOT FOUND
 |     Server: Werkzeug/2.1.2 Python/3.8.10
 |     Date: Mon, 27 Feb 2023 21:15:59 GMT
@@ -88,7 +88,7 @@ PORT   STATE SERVICE VERSION
 |     <title>404 Not Found</title>
 |     <h1>Not Found</h1>
 |     <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
-|   GetRequest: 
+|   GetRequest:
 |     HTTP/1.1 302 FOUND
 |     Server: Werkzeug/2.1.2 Python/3.8.10
 |     Date: Mon, 27 Feb 2023 21:15:53 GMT
@@ -104,7 +104,7 @@ PORT   STATE SERVICE VERSION
 |     <title>Redirecting...</title>
 |     <h1>Redirecting...</h1>
 |     <p>You should be redirected automatically to the target URL: <a href="http://127.0.0.1">http://127.0.0.1</a>. If not, click the link.
-|   HTTPOptions: 
+|   HTTPOptions:
 |     HTTP/1.1 200 OK
 |     Server: Werkzeug/2.1.2 Python/3.8.10
 |     Date: Mon, 27 Feb 2023 21:15:53 GMT
@@ -116,7 +116,7 @@ PORT   STATE SERVICE VERSION
 |     Via: 1.1 varnish (Varnish/6.2)
 |     Accept-Ranges: bytes
 |     Connection: close
-|   RTSPRequest, SIPOptions: 
+|   RTSPRequest, SIPOptions:
 |_    HTTP/1.1 400 Bad Request
 1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
 SF-Port80-TCP:V=7.92%I=7%D=2/27%Time=63FD1D8B%P=x86_64-pc-linux-gnu%r(GetR
@@ -149,7 +149,7 @@ SF:.</p>\n")%r(SIPOptions,1C,"HTTP/1\.1\x20400\x20Bad\x20Request\r\n\r\n");
 Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 ```
 
-El puerto **22** es **SSH** y el puerto **80** **HTTP**. 
+El puerto **22** es **SSH** y el puerto **80** **HTTP**.
 
 Las **tecnologías** que se están empleando en la **página web** (puerto 80) son:
 
@@ -178,7 +178,7 @@ Se trata de un **panel de inicio de sesión**. Podríamos intentar explotar alg�
 
 ![imagen 4](Pasted image 20230227224746.png)
 
-En la **línea 169**, descubrimos el nombre de usuario *robert-dev-14529*. 
+En la **línea 169**, descubrimos el nombre de usuario *robert-dev-14529*.
 
 La página principal dispone de un botón llamado *FORGOT THE PASSWORD?* El botón nos lleva a *http://10.10.11.188/forgot*:
 
@@ -192,7 +192,7 @@ En cambio, si introducimos un **nombre de usuario válido**, como el que encontr
 
 ![imagen 7](Pasted image 20230227224954.png)
 
-Debido a la lentitud del servidor, no es buena idea llevar a cabo una enumeración de usuarios por fuerza bruta. Aparte de esto, es interesante el **mensaje del servidor cuando el usuario existe**: se ha enviado un *link* al usuario para restablecer la contraseña. 
+Debido a la lentitud del servidor, no es buena idea llevar a cabo una enumeración de usuarios por fuerza bruta. Aparte de esto, es interesante el **mensaje del servidor cuando el usuario existe**: se ha enviado un *link* al usuario para restablecer la contraseña.
 
 En este punto, vamos a *fuzzear* directorios a ver si encontramos alguno interesante.
 
@@ -201,7 +201,7 @@ En este punto, vamos a *fuzzear* directorios a ver si encontramos alguno interes
 **Buscaremos directorios** que se encuentren bajo la URL `http://10.10.11.188/`. Lo haremos con la herramienta *gobuster*:
 
 ```bash
-gobuster dir -u http://10.10.11.188/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt        
+gobuster dir -u http://10.10.11.188/ -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
 ===============================================================
 Gobuster v3.1.0
 by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
@@ -217,19 +217,19 @@ by OJ Reeves (@TheColonial) & Christian Mehlmauer (@firefart)
 2023/02/27 22:46:47 Starting gobuster in directory enumeration mode
 ===============================================================
 /home                 (Status: 302) [Size: 189] [--> /]
-/login                (Status: 200) [Size: 5189]       
-/forgot               (Status: 200) [Size: 5227]       
+/login                (Status: 200) [Size: 5189]
+/forgot               (Status: 200) [Size: 5227]
 /tickets              (Status: 302) [Size: 189] [--> /]
-/reset                (Status: 200) [Size: 5523]       
-   
+/reset                (Status: 200) [Size: 5523]
+
 ===============================================================
 2023/02/27 22:49:00 Finished
 ===============================================================
 ```
 
-**dir** para indicar que queremos aplicar *fuzzing* de directorios.  
-**-u** para especificar la _url_.  
-**-w** para especificar el diccionario. Para _fuzzear_ directorios siempre suele emplear el mismo, _directory-list-2.3-medium.txt_. Este diccionario se puede encontrar en el propio _Parrot OS_ o en _Kali_. También se puede encontrar en el repositorio de [SecLists](https://github.com/danielmiessler/SecLists).  
+**dir** para indicar que queremos aplicar *fuzzing* de directorios.
+**-u** para especificar la _url_.
+**-w** para especificar el diccionario. Para _fuzzear_ directorios siempre suele emplear el mismo, _directory-list-2.3-medium.txt_. Este diccionario se puede encontrar en el propio _Parrot OS_ o en _Kali_. También se puede encontrar en el repositorio de [SecLists](https://github.com/danielmiessler/SecLists).
 
 Descubrimos el directorio */reset*, que tiene pinta de ser el que se utiliza para **restablecer las contraseñas de los usuarios**. El aspecto de *http://10.10.11.188/reset* es el siguiente:
 
@@ -247,7 +247,7 @@ Habiendo encontrado un **usuario válido** y el *endpoint* de restablecimiento d
 
 ### Concepto
 
-El ataque *Password Reset Poisoning (PRP)* es una técnica de ataque que tiene como objetivo obtener el control de una cuenta de usuario al explotar una vulnerabilidad en el proceso de recuperación de contraseña. 
+El ataque *Password Reset Poisoning (PRP)* es una técnica de ataque que tiene como objetivo obtener el control de una cuenta de usuario al explotar una vulnerabilidad en el proceso de recuperación de contraseña.
 
 En algunos casos, el proceso de restablecimiento de contraseñas funciona de la siguiente manera:
 
@@ -264,7 +264,7 @@ Imagen extraída de [PortSwigger](https://portswigger.net/web-security/host-head
 
 1. Un usuario **envía** una **solicitud** de **restablecimiento de la contraseña**.
 1. El **atacante** **intercepta** la solicitud, y **cambia** el valor de la **cabecera *host*** por su IP. Posteriormente, el atacante deja fluir la petición, esta llega al servidor y el **servidor envía un correo al usuario**.
-2. El **usuario**, al hacer **clic** en el **enlace** para cambiar su contraseña, en vez de ser redirigido a la página web, tramitará una **petición** *GET* al **servidor web del atacante**. 
+2. El **usuario**, al hacer **clic** en el **enlace** para cambiar su contraseña, en vez de ser redirigido a la página web, tramitará una **petición** *GET* al **servidor web del atacante**.
 3. El atacante interceptará la petición *GET* y utilizará el *token* para cambiar la contraseña del usuario.
 
 Es importante destacar que, **para explotar esta vulnerabilidad**, **se necesita la interacción de otra persona**, que es la que clicará en el enlace que le enviará el servidor para restablecer la contraseña.
@@ -335,7 +335,7 @@ Si clicamos en */admin_tickets*, el servidor nos redirige a la página principal
 
 ![imagen 23](Pasted image 20230228225535.png)
 
-Seguramente, necesitaremos disponer de una **cuenta de administrador** para poder ver el contenido de *http://10.10.11.188/admin_tickets*. 
+Seguramente, necesitaremos disponer de una **cuenta de administrador** para poder ver el contenido de *http://10.10.11.188/admin_tickets*.
 
 En este punto, vamos a intentar explotar alguna **vulnerabilidad en la tramitación de un nuevo *ticket***. Sabemos, por el reconocimiento del principio, que el servidor está utilizando un **web caché** llamado *Varnish*. Si el administrador **visualiza** el *ticket* que subimos y además **clica** en el enlace del parámetro *url*, podríamos intentar explotar un *cache poisoning*.
 
@@ -344,7 +344,7 @@ En este punto, vamos a intentar explotar alguna **vulnerabilidad en la tramitaci
 
 ### Contexto
 
-El **envenenamiento de caché web** es una estrategia sofisticada que utiliza un atacante para aprovechar el funcionamiento de un **servidor web y su caché**, con el fin de enviar una respuesta *HTTP* maliciosa a otros usuarios. 
+El **envenenamiento de caché web** es una estrategia sofisticada que utiliza un atacante para aprovechar el funcionamiento de un **servidor web y su caché**, con el fin de enviar una respuesta *HTTP* maliciosa a otros usuarios.
 
 Para comprender cómo surgen las vulnerabilidades de intoxicación de caché web, es importante tener una **comprensión básica de cómo funcionan las cachés web**.
 
@@ -357,7 +357,7 @@ La siguiente imagen ilustra el funcionamiento de las **cachés web**:
 ![imagen 24](Pasted image 20230228213714.png)
 
 
-Imagen extraída de [PortSwigger](https://portswigger.net/web-security/web-cache-poisoning). 
+Imagen extraída de [PortSwigger](https://portswigger.net/web-security/web-cache-poisoning).
 
 1. El usuario amarillo realiza una petición a la web. La petición llega a la caché y esta determina si hay una respuesta cacheada que pueda servir a esta petición. Como no la hay, la petición es enviada al servidor. Posteriormente, se cachea la respuesta.
 2. El usuario azul y rosa, tramitan una petición a la web. La caché determina que estas dos peticiones son equivalentes a la solicitud que tramitó el usuario amarillo y, por tanto, sirve la respuesta que cacheó el usuario amarillo.
@@ -414,7 +414,7 @@ Ya para acabar y dar paso a la explotación, vamos a llevar a cabo una especie d
 
 ![imagen 32](Pasted image 20230301214710.png)
 
-`Age: 118`. Efectivamente, la solicitud anterior se había cacheado hace 118 segundos y nos han servido la misma respuesta. 
+`Age: 118`. Efectivamente, la solicitud anterior se había cacheado hace 118 segundos y nos han servido la misma respuesta.
 
 Pues bien, si ahora accedemos al mismo *endpoint* sin estar autenticados, deberíamos ver en la respuesta la *cookie* del usuario *robert-dev-14529*:
 
@@ -432,7 +432,7 @@ Seguiremos los siguientes pasos:
 
 ![imagen 34](Pasted image 20230301220927.png)
 
-2. Ahora debemos esperar unos 3 minutos. El **administrador accederá** al *ticket*, visitará la *url* y como la respuesta de la solicitud no está cacheada, será cacheada por el *web cache*. 
+2. Ahora debemos esperar unos 3 minutos. El **administrador accederá** al *ticket*, visitará la *url* y como la respuesta de la solicitud no está cacheada, será cacheada por el *web cache*.
 
 **IMPORTANTE**: para que la solicitud sea cacheada por el administrador, es importante no acceder a la *http://10.10.11.188/static/uarepwneed*, ya que si no, la cachearemos nosotros y no se guardará en caché la respuesta de la solicitud del administrador, que es la que contiene la *cookie* del administrador.
 
@@ -464,7 +464,7 @@ La respuesta del servidor es la siguiente:
 
 ![imagen 36](Pasted image 20230301221048.png)
 
-Nos comparten las **credenciales SSH** del usuario *diego*: `diego:dCb#1!x0%gjq`. 
+Nos comparten las **credenciales SSH** del usuario *diego*: `diego:dCb#1!x0%gjq`.
 
 Finalmente, nos conectamos por *SSH*:
 
@@ -475,7 +475,7 @@ Finalmente, nos conectamos por *SSH*:
 Podemos encontrar la primera *flag* en el *homedir* del usuario *diego*:
 
 ```bash
-diego@forgot:~$ cat user.txt 
+diego@forgot:~$ cat user.txt
 56c0aead00efbebc78eb72982e084f40
 ```
 
@@ -594,7 +594,7 @@ def getVec(text):
         feature7 += int(lowerStr.count('%3C'))
         # add feature for http count
         feature8 = int(lowerStr.count('http'))
-        
+
         # append the features
         featureVec = np.append(featureVec,feature1)
         featureVec = np.append(featureVec,feature2)
@@ -651,7 +651,7 @@ Este código carga **varios modelos de clasificación de *machine learning*** de
 
 El modelo se apoya en la técnica de *vectorización* de texto llamada *Doc2Vec* para convertir el texto en características numéricas, y también cuenta con varias funciones que buscan **contar la presencia de ciertos patrones**, como palabras o caracteres, en el texto. Estas características se combinan en un conjunto que se utiliza para realizar la predicción mediante los modelos de clasificación cargados en la memoria.
 
-Además, este código recupera datos de una **base de datos** *MySQL* y los utiliza como **entrada para los modelos de clasificación**. Estos datos son las *reasons* de los *tickets* que se tramitan. Las **credenciales** que se utilizan para acceder a la base de datos son las de *diego*. Nos conectaremos a la base de datos con el comando: 
+Además, este código recupera datos de una **base de datos** *MySQL* y los utiliza como **entrada para los modelos de clasificación**. Estos datos son las *reasons* de los *tickets* que se tramitan. Las **credenciales** que se utilizan para acceder a la base de datos son las de *diego*. Nos conectaremos a la base de datos con el comando:
 
 ```bash
 mysql -u diego -p
@@ -663,7 +663,7 @@ Encontramos una base de datos llamada *app*:
 
 Una tabla interesante de *app* es *users*. Aquí podemos encontrar la contraseña del usuario *admin*, entre otras credenciales:
 
-```sql 
+```sql
 mysql> select * from users;
 +--------------------+----------------------+
 | username           | password             |
@@ -693,7 +693,7 @@ mysql> select * from users;
 21 rows in set (0.00 sec)
 ```
 
-Las credenciales `admin:dCvbgFh345_368352c@!` nos servirían para conectarnos a la web como **administradores**. 
+Las credenciales `admin:dCvbgFh345_368352c@!` nos servirían para conectarnos a la web como **administradores**.
 
 En *app*, también encontramos una tabla *escalete*, que es donde se guardan los *tickets* solicitados:
 
@@ -776,7 +776,7 @@ La segunda *flag* se encuentra en el *homedir* del usuario *root*:
 
 ```bash
 bash-5.0# cd /root/
-bash-5.0# cat root.txt 
+bash-5.0# cat root.txt
 7f7bfd993fee66685f3c7c890bc9ea1d
 ```
 
