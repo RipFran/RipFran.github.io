@@ -32,3 +32,4 @@ gem "jekyll-sass-converter", "~> 2.1"
 gem 'bigdecimal'
 gem 'logger'
 
+gem 'ffi'
