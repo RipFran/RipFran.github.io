@@ -15,8 +15,8 @@ Actualmente trabajo en el equipo de Red Team de KPMG España.
 
 Si quieres saber más sobre lo que hago, puedes encontrarme en:
 
-* HTB: [https://www.hackthebox.com/home/users/profile/659968](https://www.hackthebox.com/home/users/profile/659968)  
+* HTB: [https://app.hackthebox.com/profile/659968](https://app.hackthebox.com/profile/659968)  
 * GitHub: [https://github.com/RipFran](https://github.com/RipFran)  
-* LinkedIn: [https://www.linkedin.com/in/francisco-carot-ripolles-67b63a260/](https://www.linkedin.com/in/francisco-carot-ripolles-67b63a260/)
+* LinkedIn: [https://www.linkedin.com/in/francisco-carot-ripoll%C3%A9s-67b63a260/](https://www.linkedin.com/in/francisco-carot-ripoll%C3%A9s-67b63a260/)
 
 Cualquier duda, puedes escribirme por LinkedIn. Estaré encantado de charlar. ¡Un saludo!
