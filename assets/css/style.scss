@@ -1,0 +1,40 @@
+---
+---
+
+@import '{{ site.theme }}';
+
+/* append your custom style below */
+
+
+strong {
+    color:  #77DD77;
+}
+
+em {
+    color:#77DD77;
+}
+
+h1 {
+    color: #00bb2d;
+ }
+
+h2 {
+    color:#FDFD96;
+ }
+
+h4 {
+    color:#856677;
+}
+
+h3 {
+    color:#de4c8a;
+}
+
+img {
+    border: 2px solid grey;
+    border-radius: 7px;
+}
+
+pre {
+    max-height: 700px;
+}
